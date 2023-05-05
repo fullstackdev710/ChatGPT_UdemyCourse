@@ -2,7 +2,7 @@ import openai
 import win32com.client
 import tkinter as tk
 
-openai.api_key="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"
+openai.api_key="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"
 
 def last_10_emails():
    outlook=win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
@@ -26,4 +26,27 @@ dropdown.pack()
 
 label =tk.Label(root, text="")
 label.pack()
+
+def reply(): 
+   if __name__ == '__main__':
+      if __name__ == '__main__':
+         email = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI").\
+            GetDefaultFolder(6).Items.Item(selected_subject.get())
+         response = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt="Create a reply to this email:\n" + email.Body,
+            max_tokens=1024,
+            n=1,
+            stop=None,
+            temperature=0.8,
+         )
+         reply = email.Reply()
+         reply.Body=response["choices"][0]["text"]
+         reply.Display()
+         return
+
+button = tk.Button(root, text="Generate Reply",
+      command=reply)
+
+button.pack()
 root.mainloop()
