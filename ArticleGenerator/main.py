@@ -28,7 +28,19 @@ class EssayGenerator(QWidget):
       generate_button.clicked.connect(self.generate_essay)
 
    def generate_essay(self):
-      pass
+      topic=self.topic_input.text()
+
+      openai.api_key="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"
+      engine="text-davinci-003"
+      prompt="Write an article on the following topic: "+topic+"\n\n"
+      response =openai.Completion.create(engine=engine, prompt=prompt, max_tokens=1024)
+      essay=response.choices[0].text
+
+      document=docx.Document()
+      document.add_paragraph(essay)
+      document.save(topic+".docx")
+
+      self.essay_output.setText(essay)
 
 
 if __name__ == "__main__":
