@@ -6,7 +6,7 @@ from io import BytesIO
 from pathlib import Path
 import requests
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 
 def slide_generator(text, prs):
@@ -30,7 +30,44 @@ def slide_generator(text, prs):
         size="1024x1024"
     )
     image_url = response["data"][0]['url']
-    print(image_url)
+
+    prompt = f"Create a bullet point text for a Powerpoint" \
+        f"slide from the following text: \n {text}"
+    ppt = openai.Completion.create(
+        engine=model_engine,
+        prompt=prompt,
+        max_tokens=1024,
+        n=1,
+        stop=None,
+        temperature=0.8
+    )
+    ppt_text = ppt.choices[0].text
+
+    prompt = f"Create a title for a Powerpoint" \
+        f"slide from the following text: \n {text}"
+    ppt = openai.Completion.create(
+        engine=model_engine,
+        prompt=prompt,
+        max_tokens=1024,
+        n=1,
+        stop=None,
+        temperature=0.8
+    )
+    ppt_header = ppt.choices[0].text
+
+    # Add a new slide to the presetation
+    slide = prs.slides.add_slide(prs.slide_layouts[1])
+    response = requests.get(image_url)
+    img_bytes = BytesIO(response.content)
+    slide.shapes.add_picture(img_bytes, Inches(1), Inches(1))
+
+    # Add text box
+    txtBox = slide.shapes.add_textbox(
+        Inches(3), Inches(1), Inches(4), Inches(1.5))
+    tf = txtBox.text_frame
+    tf.text = ppt_text
+    title_shape = slide.shapes.title
+    title_shape.text = ppt_header
 
 
 def get_slides():
