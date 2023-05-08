@@ -1,10 +1,36 @@
 import tkinter as tk
 from pptx import Presentation
-from pptx.utill import Inches
+from pptx.util import Inches, Pt
+import openai
+from io import BytesIO
+from pathlib import Path
+import requests
+
+openai.api_key = "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"
 
 
 def slide_generator(text, prs):
-    pass
+    prompt = f"Summarize the following text to a DALL-E image generation" \
+        f"prompt: \n {text}"
+
+    model_engine = "text-davinci-003"
+    dlp = openai.Completion.create(
+        engine=model_engine,
+        prompt=prompt,
+        max_tokens=250,
+        n=1,
+        stop=None,
+        temperature=0.8
+    )
+
+    dalle_prompt = dlp.choices[0].text
+    response = openai.Image.create(
+        prompt=dalle_prompt+"Style: digital art",
+        n=1,
+        size="1024x1024"
+    )
+    image_url = response["data"][0]['url']
+    print(image_url)
 
 
 def get_slides():
